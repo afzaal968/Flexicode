@@ -1,27 +1,27 @@
-# Use the Node.js base image
-FROM node:14
+# Use a modern Node image
+FROM node:20-bullseye
 
-# Install Python, Java, C++, C, C# dependencies
+# Install compilers and runtimes
 RUN apt-get update && apt-get install -y \
     python3 \
     default-jdk \
-    default-jre \
     g++ \
     gcc \
-    mono-complete
+    mono-complete \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy your Node.js application files into the container
-COPY package.json package-lock.json ./
+# Copy dependency files first
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of your application files
+# Copy rest of the application
 COPY . .
 
-# Expose the port your Node.js server will listen on
-EXPOSE 5000
+# Use Render's dynamic port
+EXPOSE 10000
 
-# Start your Node.js server
+# Start server
 CMD ["node", "index.js"]
